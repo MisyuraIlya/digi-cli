@@ -1,0 +1,48 @@
+FROM php:8.1.2-fpm
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    git \
+    unzip \
+    libzip-dev \
+    && docker-php-ext-install zip pdo_mysql
+
+# Set PHP memory and upload size limits
+RUN echo "memory_limit=3G" > /usr/local/etc/php/conf.d/memory-limit.ini \
+    && echo "upload_max_filesize=20M" > /usr/local/etc/php/conf.d/upload-filesize.ini \
+    && echo "post_max_size=25M" >> /usr/local/etc/php/conf.d/upload-filesize.ini
+
+# Set the working directory
+WORKDIR /var/www/project
+
+# Set the COMPOSER_ALLOW_SUPERUSER environment variable
+ENV COMPOSER_ALLOW_SUPERUSER=1
+
+# Install Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+# Install Symfony CLI
+RUN curl -sS https://get.symfony.com/cli/installer | bash
+
+# Copy application files
+COPY . .
+
+# Ensure composer.lock file is updated
+# RUN composer update
+
+# Install dependencies using Composer
+# RUN composer install --no-scripts --no-autoloader
+
+# Generate autoload files
+# RUN composer dump-autoload --optimize
+
+# RUN composer require symfony/runtime
+
+# RUN composer require symfony/maker-bundle --dev
+
+# Copy initialization script
+COPY initDev.sh /usr/local/bin/initDev.sh
+RUN chmod +x /usr/local/bin/initDev.sh
+
+# Run Symfony commands ignoring errors and automatically answering yes to prompts
+CMD ["/usr/local/bin/initDev.sh"]

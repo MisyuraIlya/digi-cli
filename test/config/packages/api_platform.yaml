@@ -1,0 +1,15 @@
+api_platform:
+    title: Hello API Platform
+    eager_loading:
+        max_joins: 1000
+    version: 1.0.0
+    # Good defaults for REST APIs
+    defaults:
+        stateless: true
+        cache_headers:
+            vary: ['Content-Type', 'Authorization', 'Origin']
+        extra_properties:
+            standard_put: true
+    collection:
+        pagination:
+            items_per_page_parameter_name: itemsPerPage # Default value
