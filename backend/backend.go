@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -44,13 +45,41 @@ func CreateProject(project *Backend, bitbucketClient *bitbucket.BitbucketClient)
 
 	// 3. Create local database and user (implementation goes here)
 	databaseName := "testdb"
-	passwordDatabase := "password"
+	passwordDatabase := "yX8qD5fH0x"
 
 	// 4. Update .env file
 	if err := updateEnvFile(project, databaseName, passwordDatabase); err != nil {
 		fmt.Println("Error updating .env file:", err)
 		return
 	}
+
+	// 5. Run Composer Install
+	fmt.Println("Running composer install...")
+	if err := RunCommand(repoPath, "composer", "install", "--no-interaction", "--optimize-autoloader"); err != nil {
+		fmt.Println("Error running composer install:", err)
+		return
+	}
+
+	// 5. Run Composer Install
+	fmt.Println("composer dump-env dev")
+	if err := RunCommand(repoPath, "composer", "dump-env", "dev"); err != nil {
+		fmt.Println("Error running composer dump:", err)
+		return
+	}
+
+	// 6. Execute Symfony commands
+	fmt.Println("Running Symfony migrations...")
+	if err := RunCommand(repoPath, "php", "bin/console", "make:migration"); err != nil {
+		fmt.Println("Error running make:migration:", err)
+		return
+	}
+
+	if err := RunCommand(repoPath, "php", "bin/console", "doctrine:migrations:migrate", "--no-interaction"); err != nil {
+		fmt.Println("Error running doctrine:migrations:migrate:", err)
+		return
+	}
+
+	fmt.Println("Migrations executed successfully.")
 
 	// 5. Create (or reuse) a Bitbucket project
 	_, err = bitbucketClient.CreateProjectOrUseExist("digitradeteam", project.FolderName, project.FolderName)
@@ -209,4 +238,18 @@ func copyDir(src string, dst string) error {
 		_, err = io.Copy(destFile, srcFile)
 		return err
 	})
+}
+
+// RunCommand executes a shell command and prints the output
+func RunCommand(dir string, name string, args ...string) error {
+	cmd := exec.Command(name, args...)
+	cmd.Dir = dir
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	err := cmd.Run()
+	if err != nil {
+		return fmt.Errorf("error executing %s: %v", name, err)
+	}
+	return nil
 }
