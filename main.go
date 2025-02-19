@@ -1,6 +1,7 @@
 package main
 
 import (
+	apichecker "digi-cli/apiChecker"
 	"digi-cli/backend"
 	"digi-cli/bitbucket"
 	"digi-cli/frontend"
@@ -12,12 +13,14 @@ import (
 var menu = map[string]func(*bitbucket.BitbucketClient){
 	"1": createProjectFrontend,
 	"2": createProjectBackend,
+	"3": checkApi,
 }
 
 var menuVariatns = []string{
 	"1. Create new frontend project",
 	"2. Create new backend project",
-	"3. Exit",
+	"3. Check api",
+	"4. Exit",
 	"Choose variant",
 }
 
@@ -125,6 +128,23 @@ func createProjectBackend(clientBitbucket *bitbucket.BitbucketClient) {
 		Database:   database,
 	}
 	backend.CreateProject(project, clientBitbucket)
+}
+
+func checkApi(clientBitbucket *bitbucket.BitbucketClient) {
+	erp := promptSelectData("Which ERP is used by the client?", erpOptions)
+	apiUrl := promptData("write the api url")
+	username := promptData("write the username")
+	password := promptData("write the password")
+	database := promptData("write the database")
+
+	api := &apichecker.ApiChecker{
+		Erp:      erp,
+		ApiUrl:   apiUrl,
+		Username: username,
+		Password: password,
+		Database: database,
+	}
+	apichecker.Check(api)
 }
 
 func promptData(prompt ...string) string {
