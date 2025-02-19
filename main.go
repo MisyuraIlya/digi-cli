@@ -59,54 +59,54 @@ func createProjectFrontend(clientBitbucket *bitbucket.BitbucketClient) {
 	erp := promptSelectData("Which ERP is used by the client?", erpOptions)
 	projectNameEnglish := promptData("write the project name in english (camel case like mrKelim)")
 	projectNameHebrew := promptData("write the project name in hebrew")
-	// projectDescription := promptData("write the short desctiption in hebrew")
-	// minimumPriceStr := promptData("Write the minimum price for order")
-	// deliveryPriceStr := promptData("Write delivery price for order")
-	// isWithStock := promptBool("is used stock?")
-	// isOpenWorld := promptBool("is open world the app? (else stricted for client only)")
-	// email := promptData("write the email for support footer")
-	// location := promptData("write the location for support footer")
-	// phoneSupport := promptData("write the phone support for support footer")
-	// fax := promptData("write the fax for support footer")
-	// footerDescription1 := promptData("write section 1 description footer")
-	// footerDescription2 := promptData("write section 2 description footer")
-	// footerDescription3 := promptData("write section 3 description footer")
-	// primaryColor := promptData("write primary color of the app")
-	// secondaryColor := promptData("write secondary color of the app")
-	// oneSignalKey := promptData("set the one signal key")
-	// paymentSystem := promptData("set the one signal key")
-	// minimumPrice, err := strconv.ParseFloat(minimumPriceStr, 64)
-	// if err != nil {
-	// 	fmt.Println("Invalid minimum price:", err)
-	// 	return
-	// }
+	projectDescription := promptData("write the short desctiption in hebrew")
+	minimumPriceStr := promptData("Write the minimum price for order")
+	deliveryPriceStr := promptData("Write delivery price for order")
+	isWithStock := promptBool("is used stock?")
+	isOpenWorld := promptBool("is open world the app? (else stricted for client only)")
+	email := promptData("write the email for support footer")
+	location := promptData("write the location for support footer")
+	phoneSupport := promptData("write the phone support for support footer")
+	fax := promptData("write the fax for support footer")
+	footerDescription1 := promptData("write section 1 description footer")
+	footerDescription2 := promptData("write section 2 description footer")
+	footerDescription3 := promptData("write section 3 description footer")
+	primaryColor := promptData("write primary color of the app")
+	secondaryColor := promptData("write secondary color of the app")
+	oneSignalKey := promptData("set the one signal key")
+	paymentSystem := promptData("set the one signal key")
+	minimumPrice, err := strconv.ParseFloat(minimumPriceStr, 64)
+	if err != nil {
+		fmt.Println("Invalid minimum price:", err)
+		return
+	}
 
-	// deliveryPrice, err := strconv.ParseFloat(deliveryPriceStr, 64)
-	// if err != nil {
-	// 	fmt.Println("Invalid delivery price:", err)
-	// 	return
-	// }
+	deliveryPrice, err := strconv.ParseFloat(deliveryPriceStr, 64)
+	if err != nil {
+		fmt.Println("Invalid delivery price:", err)
+		return
+	}
 
 	project := &frontend.Frontend{
-		FolderName: projectNameEnglish,
-		Erp:        erp,
-		Title:      projectNameHebrew,
-		// Description:        projectDescription,
-		// MinimumPrice:       minimumPrice,
-		// DeliveryPrice:      deliveryPrice,
-		// IsWithStock:        isWithStock,
-		// IsOpenWorld:        isOpenWorld,
-		// Email:              email,
-		// Location:           location,
-		// PhoneSupport:       phoneSupport,
-		// Fax:                fax,
-		// FooterDescription1: footerDescription1,
-		// FooterDescription2: footerDescription2,
-		// FooterDescription3: footerDescription3,
-		// PrimaryColor:       primaryColor,
-		// SecondaryColor:     secondaryColor,
-		// OneSignalKey:       oneSignalKey,
-		// PaymentSystem:      paymentSystem,
+		FolderName:         projectNameEnglish,
+		Erp:                erp,
+		Title:              projectNameHebrew,
+		Description:        projectDescription,
+		MinimumPrice:       minimumPrice,
+		DeliveryPrice:      deliveryPrice,
+		IsWithStock:        isWithStock,
+		IsOpenWorld:        isOpenWorld,
+		Email:              email,
+		Location:           location,
+		PhoneSupport:       phoneSupport,
+		Fax:                fax,
+		FooterDescription1: footerDescription1,
+		FooterDescription2: footerDescription2,
+		FooterDescription3: footerDescription3,
+		PrimaryColor:       primaryColor,
+		SecondaryColor:     secondaryColor,
+		OneSignalKey:       oneSignalKey,
+		PaymentSystem:      paymentSystem,
 	}
 	frontend.CreateProject(project, clientBitbucket)
 }

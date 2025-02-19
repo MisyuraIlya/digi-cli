@@ -14,10 +14,25 @@ import (
 )
 
 type Frontend struct {
-	FolderName string `json:"folderName"`
-	Erp        string `json:"Erp"`
-	Title      string `json:"title"`
-	// Other fields ...
+	FolderName         string  `json:"folderName"`
+	Erp                string  `json:"Erp"`
+	Title              string  `json:"title"`
+	Description        string  `json:"description"`
+	MinimumPrice       float64 `json:"minimumPrice"`
+	DeliveryPrice      float64 `json:"deliveryPrice"`
+	IsWithStock        bool    `json:"isWithStock"`
+	IsOpenWorld        bool    `json:"isOpenWorld"`
+	Email              string  `json:"email"`
+	Location           string  `json:"location"`
+	PhoneSupport       string  `json:"phoneSupport"`
+	Fax                string  `json:"fax"`
+	FooterDescription1 string  `json:"footerDescription1"`
+	FooterDescription2 string  `json:"footerDescription2"`
+	FooterDescription3 string  `json:"footerDescription3"`
+	PrimaryColor       string  `json:"primaryColor"`
+	SecondaryColor     string  `json:"secondaryColor"`
+	OneSignalKey       string  `json:"oneSignalKey"`
+	PaymentSystem      string  `json:"paymentSystem"`
 }
 
 func CreateProject(project *Frontend, bitbucketClient *bitbucket.BitbucketClient) {
@@ -41,8 +56,29 @@ func CreateProject(project *Frontend, bitbucketClient *bitbucket.BitbucketClient
 	// (Optional) Step 3: Create/update any configuration files in the project.
 	configContent := fmt.Sprintf(`global.settings = {
 		title: "%s",
-		Erp: "%s"
-	}`, project.Title, project.Erp)
+		Erp: "%s",
+		description: "%s",
+		minimumPrice: %.2f,
+		deliveryPrice: %.2f,
+		isWithStock: %t,
+		isOpenWorld: %t,
+		email: "%s",
+		location: "%s",
+		phoneSupport: "%s",
+		fax: "%s",
+		footerDescription1: "%s",
+		footerDescription2: "%s",
+		footerDescription3: "%s",
+		primaryColor: "%s",
+		secondaryColor: "%s",
+		oneSignalKey: "%s",
+		paymentSystem: "%s"
+	};`,
+		project.Title, project.Erp, project.Description, project.MinimumPrice, project.DeliveryPrice,
+		project.IsWithStock, project.IsOpenWorld, project.Email, project.Location,
+		project.PhoneSupport, project.Fax, project.FooterDescription1, project.FooterDescription2,
+		project.FooterDescription3, project.PrimaryColor, project.SecondaryColor,
+		project.OneSignalKey, project.PaymentSystem)
 	configPath := filepath.Join(repoPath, "global.js")
 	if err := os.WriteFile(configPath, []byte(configContent), 0644); err != nil {
 		fmt.Println("Error writing global.js file:", err)
