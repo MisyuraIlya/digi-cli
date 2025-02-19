@@ -1,22 +1,35 @@
 package main
 
 import (
+	"digi-cli/backend"
+	"digi-cli/bitbucket"
+	"digi-cli/frontend"
 	"fmt"
 	"strconv"
 	"strings"
-	"digi-cli/bitbucket"
-	"digi-cli/frontend"
 )
 
-
 var menu = map[string]func(*bitbucket.BitbucketClient){
-    "1": createProject,
+	"1": createProjectFrontend,
+	"2": createProjectBackend,
 }
 
 var menuVariatns = []string{
-	"1. Create new project",
-	"2. Exit",
+	"1. Create new frontend project",
+	"2. Create new backend project",
+	"3. Exit",
 	"Choose variant",
+}
+
+var erpOptions = []string{
+	"SAP",
+	"PRIORITY",
+}
+
+var paymenyOptions = []string{
+	"yadsarig",
+	"tranzilla",
+	"none",
 }
 
 func main() {
@@ -38,18 +51,7 @@ Menu:
 	}
 }
 
-func createProject(clientBitbucket *bitbucket.BitbucketClient) {
-	erpOptions := []string{
-		"SAP",
-		"PRIORITY",
-	}
-
-	// paymenyOptions := []string{
-	// 	"yadsarig",
-	// 	"tranzilla",
-	// 	"none",
-	// }
-
+func createProjectFrontend(clientBitbucket *bitbucket.BitbucketClient) {
 
 	erp := promptSelectData("Which ERP is used by the client?", erpOptions)
 	projectNameEnglish := promptData("write the project name in english (camel case like mrKelim)")
@@ -83,9 +85,9 @@ func createProject(clientBitbucket *bitbucket.BitbucketClient) {
 	// }
 
 	project := &frontend.Frontend{
-		FolderName: 		projectNameEnglish,
-		Erp:				erp,
-		Title:              projectNameHebrew,
+		FolderName: projectNameEnglish,
+		Erp:        erp,
+		Title:      projectNameHebrew,
 		// Description:        projectDescription,
 		// MinimumPrice:       minimumPrice,
 		// DeliveryPrice:      deliveryPrice,
@@ -103,7 +105,26 @@ func createProject(clientBitbucket *bitbucket.BitbucketClient) {
 		// OneSignalKey:       oneSignalKey,
 		// PaymentSystem:      paymentSystem,
 	}
-	frontend.CreateProject(project,clientBitbucket)
+	frontend.CreateProject(project, clientBitbucket)
+}
+
+func createProjectBackend(clientBitbucket *bitbucket.BitbucketClient) {
+	erp := promptSelectData("Which ERP is used by the client?", erpOptions)
+	projectNameEnglish := promptData("write the project name in english (camel case like mrKelim)")
+	projectNameHebrew := promptData("write the project name in hebrew")
+	username := promptData("write the username")
+	password := promptData("write the password")
+	database := promptData("write the database")
+
+	project := &backend.Backend{
+		FolderName: projectNameEnglish,
+		Erp:        erp,
+		Title:      projectNameHebrew,
+		Username:   username,
+		Password:   password,
+		Database:   database,
+	}
+	backend.CreateProject(project, clientBitbucket)
 }
 
 func promptData(prompt ...string) string {
