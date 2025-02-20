@@ -37,6 +37,14 @@ var paymentOptions = []string{
 	"none",
 }
 
+var smsCenterOptions = []string{
+	"activeTrail",
+	"flashy",
+	"informu",
+	"zeroSms",
+	"none",
+}
+
 func main() {
 	client := &bitbucket.BitbucketClient{
 		Username:    "ilya_mi",
@@ -114,22 +122,91 @@ func createProjectFrontend(clientBitbucket *bitbucket.BitbucketClient) {
 }
 
 func createProjectBackend(clientBitbucket *bitbucket.BitbucketClient) {
-	erp := promptSelectData("Which ERP is used by the client?", erpOptions)
-	projectNameEnglish := promptData("write the project name in english (camel case like mrKelim)")
-	projectNameHebrew := promptData("write the project name in hebrew")
-	username := promptData("write the username")
-	password := promptData("write the password")
-	database := promptData("write the database")
+	// Local AWS DB
+	mysqlDbName := promptData("Create MySQL in VPS and set the DB name/username")
+	mysqlDbPassword := promptData("Create MySQL in VPS and set the DB password")
 
-	project := &backend.Backend{
-		FolderName: projectNameEnglish,
-		Erp:        erp,
-		Title:      projectNameHebrew,
-		Username:   username,
-		Password:   password,
-		Database:   database,
+	// API
+	apiUrl := promptData("Write the API URL")
+	erp := promptSelectData("Which ERP is used by the client?", erpOptions)
+	username := promptData("Write the API username")
+	password := promptData("Write the API password")
+	database := promptData("Write the API database")
+
+	// App Creation
+	folderName := promptData("Write the folder name on the server")
+
+	// Configuration
+	title := promptData("Write in English the project name")
+	isWithMigvan := promptBool("Is with Migvan? (y/n)")
+	obligoBlock := promptBool("Obligo block? (y/n)")
+	isOnlinePrice := promptBool("Is online price? (y/n)")
+	isStockOnline := promptBool("Is stock online? (y/n)")
+
+	oneSignalAppId := promptData("(Optional) Write the OneSignal App ID if exists")
+	oneSignalKey := promptData("(Optional) Write the OneSignal key if exists")
+
+	smsCenter := promptSelectData("Choose the SMS center that the client uses", smsCenterOptions)
+	var smsToken string
+	if smsCenter != "none" {
+		smsToken = promptData("(Optional) Write the SMS token")
+	} else {
+		smsToken = ""
 	}
-	backend.CreateProject(project, clientBitbucket)
+
+	paymentSystem := promptSelectData("Choose the payment system that the client uses", paymentOptions)
+	var yadKey, passp, successLink, errorLink, masof string
+	if paymentSystem != "none" {
+		if paymentSystem == "yadsarig" {
+			yadKey = promptData("(Optional) Write the Yad key")
+			passp = promptData("(Optional) Write the Passp")
+		} else {
+			yadKey = ""
+			passp = ""
+		}
+		successLink = promptData("(Optional) Write the success link")
+		errorLink = promptData("(Optional) Write the error link")
+		masof = promptData("(Optional) Write the Masof")
+	} else {
+		successLink = ""
+		errorLink = ""
+		masof = ""
+	}
+
+	backendProject := &backend.Backend{
+		// Local AWS DB
+		MysqlDbName:     mysqlDbName,
+		MysqlDbPassword: mysqlDbPassword,
+
+		// API
+		Api:      apiUrl,
+		Erp:      erp,
+		Username: username,
+		Password: password,
+		Database: database,
+
+		// App Creation
+		FolderName: folderName,
+
+		// Configuration
+		Title:          title,
+		IsWithMigvan:   isWithMigvan,
+		ObligoBlock:    obligoBlock,
+		IsOnlinePrice:  isOnlinePrice,
+		IsStockOnline:  isStockOnline,
+		OneSignalAppId: oneSignalAppId,
+		OneSignalKey:   oneSignalKey,
+		SmsCenter:      smsCenter,
+		SmsToken:       smsToken,
+		PaymentSystem:  paymentSystem,
+		SuccessLink:    successLink,
+		ErrorLink:      errorLink,
+		Masof:          masof,
+		YadKey:         yadKey,
+		Passp:          passp,
+	}
+
+	backend.CreateProject(backendProject, clientBitbucket)
 }
 
 func checkApi(clientBitbucket *bitbucket.BitbucketClient) {
