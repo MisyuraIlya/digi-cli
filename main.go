@@ -51,7 +51,7 @@ func main() {
 		AppPassword: "3FXHJRwT4pZ28xY2PULh",
 	}
 
-	fmt.Println("Digitrage Ilya manager")
+	fmt.Println("Project creator [Created By Ilya]")
 
 Menu:
 	for {
