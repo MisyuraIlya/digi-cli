@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	apichecker "digi-cli/apiChecker"
 	"digi-cli/backend"
 	"digi-cli/bitbucket"
@@ -8,6 +9,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"os"
 )
 
 var menu = map[string]func(*bitbucket.BitbucketClient){
@@ -29,7 +31,7 @@ var erpOptions = []string{
 	"PRIORITY",
 }
 
-var paymenyOptions = []string{
+var paymentOptions = []string{
 	"yadsarig",
 	"tranzilla",
 	"none",
@@ -74,7 +76,7 @@ func createProjectFrontend(clientBitbucket *bitbucket.BitbucketClient) {
 	primaryColor := promptData("write primary color of the app")
 	secondaryColor := promptData("write secondary color of the app")
 	oneSignalKey := promptData("set the one signal key")
-	paymentSystem := promptData("set the one signal key")
+	paymentSystem := promptSelectData("Which payment system used?", paymentOptions)
 	minimumPrice, err := strconv.ParseFloat(minimumPriceStr, 64)
 	if err != nil {
 		fmt.Println("Invalid minimum price:", err)
@@ -155,15 +157,18 @@ func promptData(prompt ...string) string {
 			fmt.Println(line)
 		}
 	}
-	var res string
-	fmt.Scanln(&res)
-	return res
+
+	reader := bufio.NewReader(os.Stdin)
+	text, err := reader.ReadString('\n')
+	if err != nil {
+		fmt.Println("Error reading input:", err)
+		return ""
+	}
+	return strings.TrimSpace(text)
 }
 
-// promptSelectData displays a list of options and asks the user to choose one.
 func promptSelectData(question string, options []string) string {
 	fmt.Println(question)
-	// Display options with their numbers.
 	for i, option := range options {
 		fmt.Printf("%d. %s\n", i+1, option)
 	}
@@ -172,11 +177,9 @@ func promptSelectData(question string, options []string) string {
 	var input string
 	fmt.Scanln(&input)
 
-	// Convert input to an integer index.
 	index, err := strconv.Atoi(input)
 	if err != nil || index < 1 || index > len(options) {
 		fmt.Println("Invalid selection, please try again.")
-		// Recursively ask until a valid option is chosen.
 		return promptSelectData(question, options)
 	}
 	return options[index-1]
@@ -184,12 +187,10 @@ func promptSelectData(question string, options []string) string {
 
 func promptBool(prompt string) bool {
 	for {
-		// Display the prompt with a (y/n) hint.
 		fmt.Printf("%s (y/n): ", prompt)
 		var input string
 		fmt.Scanln(&input)
 
-		// Normalize the input to lower case and trim any extra spaces.
 		input = strings.TrimSpace(strings.ToLower(input))
 		if input == "y" || input == "yes" {
 			return true

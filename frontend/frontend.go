@@ -56,7 +56,7 @@ func CreateProject(project *Frontend, bitbucketClient *bitbucket.BitbucketClient
 	// (Optional) Step 3: Create/update any configuration files in the project.
 	configContent := fmt.Sprintf(`global.settings = {
 		title: "%s",
-		Erp: "%s",
+		erp: "%s",
 		description: "%s",
 		minimumPrice: %.2f,
 		deliveryPrice: %.2f,
